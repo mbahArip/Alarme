@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+<!--    <item-->
+<!--        android:id="@+id/itemmenu_edit"-->
+<!--        android:title="Edit reminder" />-->
+    <item
+        android:id="@+id/itemmenu_delete"
+        android:title="Hapus reminder"/>
+
+</menu>

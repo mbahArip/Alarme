@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="alarme_dark">#FF1A1A1A</color>
+    <color name="alarme_darkItem">#FF262626</color>
+    <color name="alarme_darkLighter">#FF323232</color>
+    <color name="alarme_purple">#FF8c509f</color>
+    <color name="alarme_gold">#FFf69f35</color>
+    <color name="alarme_white">#FFFFFFFF</color>
+    <color name="alarme_whiteDarker">#FFa0a0a0</color>
+</resources>

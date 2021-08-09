@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Alarme!</string>
+    <string name="dash_empty">Tidak ada jadwal.</string>
+</resources>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/alarme_dark">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/alarme_dark"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        android:outlineProvider="bounds">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="25dp"
+            android:src="@drawable/ic_splash_logo" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/add_form"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="25dp"
+        app:layout_constraintTop_toBottomOf="@id/linearLayout"
+        tools:layout_editor_absoluteX="151dp"
+        tools:layout_editor_absoluteY="100dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:gravity="start"
+            android:text="+  Reminder baru"
+            android:textSize="25dp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/add_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:background="@drawable/input_background"
+            android:hint="Judul reminder"
+            android:inputType="text"
+            android:padding="10dp"
+            android:textColor="@color/alarme_dark"
+            android:textColorHint="@color/alarme_whiteDarker" />
+
+        <EditText
+            android:id="@+id/add_description"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_margin="15dp"
+            android:background="@drawable/input_background"
+            android:gravity="top|left"
+            android:hint="Deskripsi reminder"
+            android:inputType="text"
+            android:padding="10dp"
+            android:textColor="@color/alarme_dark"
+            android:textColorHint="@color/alarme_whiteDarker" />
+        <!--        <TimePicker-->
+        <!--            android:id="@+id/add_time"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:timePickerMode="spinner"-->
+        <!--            android:background="@drawable/input_background"-->
+        <!--            android:layout_gravity="center"-->
+        <!--            android:layout_margin="15dp"-->
+        <!--            />-->
+        <!--        <DatePicker-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:datePickerMode="spinner"-->
+        <!--            android:background="@drawable/input_background"-->
+        <!--            android:layout_margin="15dp"-->
+        <!--            />-->
+
+
+        <!--        <Button-->
+        <!--            android:id="@+id/add_tambah"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:padding="15dp"-->
+        <!--            android:text="Tambah reminder"-->
+        <!--            android:textStyle="bold" />-->
+
+        <!--        <Button-->
+        <!--            android:id="@+id/add_batal"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:backgroundTint="@color/alarme_whiteDarker"-->
+        <!--            android:padding="15dp"-->
+        <!--            android:text="Kembali"-->
+        <!--            android:textStyle="bold" />-->
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/add_form"
+        app:layout_constraintVertical_bias="0.95">
+
+        <Button
+            android:id="@+id/add_tambah"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:text="Tambah reminder"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/add_batal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/alarme_whiteDarker"
+            android:padding="15dp"
+            android:text="Kembali"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

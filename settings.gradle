@@ -1,0 +1,2 @@
+rootProject.name = "Kelompok3-TIFRP19CIDA-Alarme"
+include ':app'
