@@ -8,7 +8,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -24,14 +30,34 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.kelompok3_tifrp19cida_alarme.util.alarmHelper;
+import com.example.kelompok3_tifrp19cida_alarme.util.dbHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONStringer;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+
+/*
+DONE: Check ulang date to unix di addReminder.
+DONE: Check ulang unix to date di dashboard.
+TODO: Notifikasi, terus alarm.
+ */
 public class dashboard extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
-    String gtaskTitle[] = {"Tugas A", "Tugas B", "Tugas C", "Tugas A", "Tugas B", "Tugas C", "Tugas A", "Tugas B", "Tugas C"};
-    String gtaskDescription[] = {"Tugas A description", "Tugas B description", "Tugas C description", "Tugas A description", "Tugas B description", "Tugas C description", "Tugas A description", "Tugas B description", "Tugas C description"};
-    String gtaskTime[] = {"20:00", "08:00", "12:00", "20:00", "08:00", "12:00", "20:00", "08:00", "12:00"};
-    String gtaskDate[] = {"21/07/2021", "22/07/2021", "23/07/2021", "21/07/2021", "22/07/2021", "23/07/2021", "21/07/2021", "22/07/2021", "23/07/2021"};
+    dbHelper db = new dbHelper(this);
+    alarmHelper ah = new alarmHelper();
+    ArrayList<JSONObject> listItem;
+    RelativeLayout emptyView;
+    ListView taskList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,30 +67,16 @@ public class dashboard extends AppCompatActivity implements PopupMenu.OnMenuItem
         setContentView(R.layout.activity_dashboard);
         getSupportActionBar().hide();
 
-        RelativeLayout emptyView = (RelativeLayout) findViewById(R.id.dash_reLayout);
-        ListView taskList = (ListView) findViewById(R.id.dash_tasklist);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-
-        if(gtaskTitle.length == 0){
-            emptyView.setVisibility(View.VISIBLE);
-            taskList.setVisibility(View.GONE);
-        } else {
-            emptyView.setVisibility(View.GONE);
-            taskList.setVisibility(View.VISIBLE);
-
-            populateTask populate = new populateTask(this, gtaskTitle, gtaskDescription, gtaskTime, gtaskDate);
-            taskList.setAdapter(populate);
-
-            taskList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    String message = "Touch position : " + position;
-//                    Toast.makeText(dashboard.this, message, Toast.LENGTH_SHORT).show();
-//                    System.out.println(view);
-                    openMenu(view, position);
-                }
-            });
+        listItem = new ArrayList<>();
+        try {
+            viewData();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
+        emptyView = findViewById(R.id.dash_reLayout);
+        taskList = findViewById(R.id.dash_tasklist);
+        FloatingActionButton fab = findViewById(R.id.fab);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,16 +88,95 @@ public class dashboard extends AppCompatActivity implements PopupMenu.OnMenuItem
         });
     }
 
+    public void viewData() throws JSONException {
+        Cursor cursor = db.viewData();
+
+        if(cursor.getCount() == 0){
+            this.showEmpty();
+//            Toast.makeText(dashboard.this, "Tidak ada data yang dapat di load! Silahkan buat reminder!", Toast.LENGTH_LONG).show();
+        } else {
+            this.hideEmpty();
+
+            while (cursor.moveToNext()){
+                JSONObject json = new JSONObject();
+                json.put("id", cursor.getString(0));
+                json.put("title", cursor.getString(1));
+                json.put("desc", cursor.getString(2));
+                json.put("time", cursor.getString(3));
+                listItem.add(json);
+                Log.d("Timestamp", json.toString());
+            }
+            ListView list = findViewById(R.id.dash_tasklist);
+
+            ArrayList<String> arrayId = new ArrayList<String>();
+            ArrayList<String> arrayTitle = new ArrayList<String>();
+            ArrayList<String> arrayDesc = new ArrayList<String>();
+            ArrayList<String> arrayTime = new ArrayList<String>();
+            ArrayList<String> arrayDate = new ArrayList<String>();
+            for(int i = 0; i < listItem.size(); i++){
+                JSONObject json = new JSONObject(listItem.get(i).toString());
+                int id = json.getInt("id");
+                String title = json.getString("title");
+                String desc = json.getString("desc");
+                String time = json.getString("time");
+
+                //Format time here
+                Long unix = Long.valueOf(time);
+                String timestamp = new Date(unix).toString();
+                SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+                Date d = null;
+                try {
+                    d = sdf.parse(timestamp);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                //Format to Hour and Day
+                SimpleDateFormat timeHour = new SimpleDateFormat("HH:mm");
+                SimpleDateFormat timeDay = new SimpleDateFormat("dd / MMM / yyyy");
+                String strTimeHour = timeHour.format(d);
+                String strTimeDay = timeDay.format(d);
+
+                arrayId.add(String.valueOf(id));
+                arrayTitle.add(title);
+                arrayDesc.add(desc);
+                arrayTime.add(strTimeHour);
+                arrayDate.add(strTimeDay);
+
+                ah.setAlarm(dashboard.this, unix, title, desc, id);
+            }
+            Log.d("ViewData", arrayId.toString());
+
+            String[] tId = arrayId.toArray(new String[arrayTitle.size()]);
+            String[] tTitle = arrayTitle.toArray(new String[arrayTitle.size()]);
+            String[] tDesc = arrayDesc.toArray(new String[arrayTitle.size()]);
+            String[] tTime = arrayTime.toArray(new String[arrayTitle.size()]);
+            String[] tDate = arrayDate.toArray(new String[arrayTitle.size()]);
+            populateTask populate = new populateTask(this, tId, tTitle, tDesc, tTime, tDate);
+            list.setAdapter(populate);
+            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    int passedId = Integer.valueOf((String) list.getAdapter().getItem(position));
+                    openMenu(view, position, passedId);
+                }
+            });
+
+        }
+    }
+
     class populateTask extends ArrayAdapter<String>{
         Context context;
-        String taskTitle[];
-        String taskDescription[];
-        String taskTime[];
-        String taskDate[];
+        String[] taskId;
+        String[] taskTitle;
+        String[] taskDescription;
+        String[] taskTime;
+        String[] taskDate;
 
-        populateTask(Context c, String title[], String description[], String time[], String date[]){
-            super(c, R.layout.task_item, R.id.list_title, title);
+        populateTask(Context c, String[] id, String[] title, String[] description, String[] time, String[] date){
+            super(c, R.layout.task_item, R.id.list_title, id);
             this.context = c;
+            this.taskId = id;
             this.taskTitle = title;
             this.taskDescription = description;
             this.taskTime = time;
@@ -97,11 +188,13 @@ public class dashboard extends AppCompatActivity implements PopupMenu.OnMenuItem
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             LayoutInflater layoutInflater = (LayoutInflater)getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View item = layoutInflater.inflate(R.layout.task_item, parent, false);
+            TextView itemId = item.findViewById(R.id.list_id);
             TextView itemTitle = item.findViewById(R.id.list_title);
             TextView itemDesc = item.findViewById(R.id.list_description);
             TextView itemTime = item.findViewById(R.id.list_time);
             TextView itemDate = item.findViewById(R.id.list_date);
 
+            itemId.setText(taskId[position]);
             itemTitle.setText(taskTitle[position]);
             itemDesc.setText(taskDescription[position]);
             itemTime.setText(taskTime[position]);
@@ -111,7 +204,7 @@ public class dashboard extends AppCompatActivity implements PopupMenu.OnMenuItem
         }
     }
 
-    public void openMenu(View v, final int position) {
+    public void openMenu(View v, final int position, int id) {
         PopupMenu menu = new PopupMenu(this, v, Gravity.END);
         menu.setOnMenuItemClickListener(this);
         menu.inflate(R.menu.item_menu);
@@ -131,7 +224,15 @@ public class dashboard extends AppCompatActivity implements PopupMenu.OnMenuItem
                                 .setPositiveButton("Hapus", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        Toast.makeText(dashboard.this, "Delete reminder", Toast.LENGTH_SHORT).show();
+                                        try {
+                                            db.deleteData(id);
+                                            Toast.makeText(dashboard.this, "Reminder berhasil dihapus!", Toast.LENGTH_SHORT).show();
+                                            recreate();
+                                        }catch (SQLException e){
+                                            e.printStackTrace();
+                                            Toast.makeText(dashboard.this, "Reminder gagal dihapus!", Toast.LENGTH_SHORT).show();
+                                            return;
+                                        }
                                     }
                                 })
                                 .setNegativeButton("Batal", null)
@@ -146,26 +247,49 @@ public class dashboard extends AppCompatActivity implements PopupMenu.OnMenuItem
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()){
-//            case R.id.itemmenu_edit:
-//                Toast.makeText(dashboard.this, "Edit reminder", Toast.LENGTH_SHORT).show();
+//        switch (item.getItemId()){
+////            case R.id.itemmenu_edit:
+////                Toast.makeText(dashboard.this, "Edit reminder", Toast.LENGTH_SHORT).show();
+////                return true;
+//            case R.id.itemmenu_delete:
+//                AlertDialog alert = new AlertDialog.Builder(this)
+//                        .setTitle("Hapus reminder")
+//                        .setMessage("Apa anda yakin ingin menghapus reminder ini?")
+//                        .setPositiveButton("Hapus", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                try{
+////                                    db.deleteData();
+//                                    Toast.makeText(dashboard.this, "Reminder berhasil dihapus!", Toast.LENGTH_SHORT).show();
+//                                } catch (Exception e){
+//                                    e.printStackTrace();
+//                                    Toast.makeText(dashboard.this, "Reminder gagal dihapus!", Toast.LENGTH_SHORT).show();
+//                                    return;
+//                                }
+//                            }
+//                        })
+//                        .setNegativeButton("Batal", null)
+//                        .show();
 //                return true;
-            case R.id.itemmenu_delete:
-                AlertDialog alert = new AlertDialog.Builder(this)
-                        .setTitle("Hapus reminder")
-                        .setMessage("Apa anda yakin ingin menghapus reminder ini?")
-                        .setPositiveButton("Hapus", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(dashboard.this, "Delete reminder", Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .setNegativeButton("Batal", null)
-                        .show();
-                return true;
-            default:
-                return false;
-        }
+//            default:
+//                return false;
+//        }
+        return false;
     }
 
+    public void showEmpty(){
+        emptyView = findViewById(R.id.dash_reLayout);
+        taskList = findViewById(R.id.dash_tasklist);
+        emptyView.setVisibility(View.VISIBLE);
+        taskList.setVisibility(View.GONE);
+    }
+    public void hideEmpty(){
+        emptyView = findViewById(R.id.dash_reLayout);
+        taskList = findViewById(R.id.dash_tasklist);
+        emptyView.setVisibility(View.GONE);
+        taskList.setVisibility(View.VISIBLE);
+    }
+    public void refresh(){
+        recreate();
+    }
 }

@@ -19,7 +19,8 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_margin="25dp"
-            android:src="@drawable/ic_splash_logo" />
+            android:src="@drawable/ic_splash_logo"
+            android:contentDescription="TODO" />
     </LinearLayout>
 
     <LinearLayout

@@ -15,7 +15,7 @@
         android:layout_margin="6dp"
         android:src="@drawable/ic_alarm"
         android:layout_gravity="center_vertical"
-        />
+        android:contentDescription="TODO" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -27,6 +27,14 @@
         >
 
         <TextView
+            android:id="@+id/list_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lorem"
+            android:textColor="@color/alarme_white"
+            android:visibility="gone"/>
+
+        <TextView
             android:id="@+id/list_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -34,7 +42,8 @@
             android:textColor="@color/alarme_white"
             android:textSize="20sp"
             android:layout_marginBottom="5dp"
-            android:maxWidth="200dp"
+            android:minWidth="150dp"
+            android:maxWidth="150dp"
             android:maxLines="1"
             android:ellipsize="end"
             />
@@ -45,7 +54,8 @@
             android:text="Lorem ipsum dolor sit amet."
             android:textColor="@color/alarme_whiteDarker"
             android:textSize="15sp"
-            android:maxWidth="200dp"
+            android:minWidth="150dp"
+            android:maxWidth="150dp"
             android:maxLines="1"
             android:ellipsize="end"
             />

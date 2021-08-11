@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.kelompok3_tifrp19cida_alarme">
 
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_icon_square"
@@ -9,8 +12,10 @@
         android:roundIcon="@drawable/ic_icon_circle"
         android:supportsRtl="true"
         android:theme="@style/Theme.Kelompok3TIFRP19CIDAAlarme">
+
         <activity android:name=".dashboard">
         </activity>
+
         <activity android:name=".splashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -18,7 +23,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".addReminder" />
-    </application>
 
+        <activity android:name=".addReminder">
+        </activity>
+
+        <receiver android:process=":remote" android:name=".util.alarmHelper"></receiver>
+    </application>
 </manifest>

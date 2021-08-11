@@ -18,7 +18,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_splash_logo" />
+        app:srcCompat="@drawable/ic_splash_logo"
+        android:contentDescription="TODO" />
 
     <EditText
         android:id="@+id/editTextTextPersonName"
@@ -109,5 +110,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/ic_icon_simple_color" />
+        app:srcCompat="@drawable/ic_icon_simple_color"
+        android:contentDescription="TODO" />
 </androidx.constraintlayout.widget.ConstraintLayout>
