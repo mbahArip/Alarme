@@ -1,6 +1,5 @@
 <p align="center" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
     <img src="Alarme_assets\splash-logo.svg" alt="Alarme Logo" height="150px">
-    <hr>
 </p>
 
 ## Tentang 
