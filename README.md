@@ -11,4 +11,4 @@ Aplikasi sederhana ini berfungsi seperti reminder, yang akan menampung semua keg
 - Dede Rosidin - 19552011028
 - Ega Permana - 19552011198
 - Farhan Muhammad S - 19552011286
-- Rizky Hendra Saputra -
+- Rizky Hendra Saputra - 19552011189
